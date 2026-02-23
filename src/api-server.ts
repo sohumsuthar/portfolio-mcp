@@ -1,4 +1,4 @@
-import express, { Request, Response } from 'express';
+import express, { Request, Response, NextFunction } from 'express';
 import cors from 'cors';
 import { loadConfig } from './config.js';
 import { PostTools } from './post-tools.js';
@@ -11,8 +11,52 @@ const projectTools = new ProjectTools(config);
 const gitTools = new GitTools(config);
 
 const app = express();
-app.use(cors());
-app.use(express.json());
+
+// Security: CORS with restricted origins
+const allowedOrigins = [
+  'https://sohumsuthar.com',
+  'http://localhost:3000',
+  process.env.ALLOWED_ORIGIN || ''
+].filter(Boolean);
+
+app.use(cors({
+  origin: allowedOrigins,
+  credentials: true,
+  methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
+  allowedHeaders: ['Content-Type', 'Authorization']
+}));
+
+app.use(express.json({ limit: '10mb' }));
+
+// Security: API key authentication middleware
+const apiKeyAuth = (req: Request, res: Response, next: NextFunction) => {
+  const apiKey = req.headers.authorization?.replace('Bearer ', '');
+  const expectedKey = process.env.API_KEY;
+
+  // Allow health check without auth
+  if (req.path === '/health') {
+    return next();
+  }
+
+  if (!expectedKey) {
+    console.warn('Warning: API_KEY not set in environment');
+    return next(); // For development
+  }
+
+  if (!apiKey || apiKey !== expectedKey) {
+    return res.status(401).json({ error: 'Unauthorized: Invalid or missing API key' });
+  }
+
+  next();
+};
+
+app.use(apiKeyAuth);
+
+// Security: Request logging
+app.use((req: Request, res: Response, next: NextFunction) => {
+  console.log(`[${new Date().toISOString()}] ${req.method} ${req.path}`);
+  next();
+});
 
 // Health check
 app.get('/health', (req: Request, res: Response) => {
@@ -124,9 +168,27 @@ app.post('/api/git/commit-push', async (req: Request, res: Response) => {
   }
 });
 
-const port = config.api.port;
-const host = config.api.host;
-
-app.listen(port, host, () => {
-  console.log(`portfolio-mcp REST API listening on http://${host}:${port}`);
+// Error handling middleware
+app.use((err: any, req: Request, res: Response, next: NextFunction) => {
+  console.error('Error:', err);
+  res.status(500).json({
+    error: process.env.NODE_ENV === 'production' ? 'Internal server error' : err.message
+  });
 });
+
+// 404 handler
+app.use((req: Request, res: Response) => {
+  res.status(404).json({ error: 'Not found' });
+});
+
+const port = parseInt(process.env.PORT || String(config.api.port), 10);
+const host = process.env.HOST || config.api.host;
+
+if (process.env.NODE_ENV !== 'production') {
+  app.listen(port, host, () => {
+    console.log(`portfolio-mcp REST API listening on http://${host}:${port}`);
+  });
+}
+
+// Export for Vercel
+export default app;

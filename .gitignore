@@ -1,6 +1,12 @@
 node_modules/
 dist/
 .env
+.env.local
+.env.*.local
 portfolio-mcp.config.json
 *.log
 .DS_Store
+.vercel
+.idea/
+*.swp
+*.swo
