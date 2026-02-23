@@ -1,0 +1,14 @@
+{
+  "portfolioPath": "/home/sohum/Documents/codex/suthar-portfolio",
+  "postsDir": "data/posts",
+  "projectsFile": "data/projectsData.js",
+  "git": {
+    "remote": "origin",
+    "branch": "main",
+    "requireConfirmation": true
+  },
+  "api": {
+    "port": 3333,
+    "host": "localhost"
+  }
+}
