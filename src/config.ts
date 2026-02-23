@@ -1,10 +1,6 @@
 import { readFileSync, existsSync } from 'fs';
 import path from 'path';
-import { fileURLToPath } from 'url';
 import { Config } from './types.js';
-
-const __filename = fileURLToPath(import.meta.url);
-const __dirname = path.dirname(__filename);
 
 export function loadConfig(): Config {
   // Try environment variables first (for Vercel/cloud deployment)

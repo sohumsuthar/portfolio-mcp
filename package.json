@@ -2,7 +2,6 @@
   "name": "portfolio-mcp",
   "version": "1.0.0",
   "description": "MCP server for managing portfolio posts and projects",
-  "type": "module",
   "main": "dist/index.js",
   "scripts": {
     "build": "tsc",
