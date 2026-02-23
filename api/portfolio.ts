@@ -173,10 +173,14 @@ async function listProjects() {
   const match = stripped.match(/(?:export\s+)?const\s+projectsData\s*=\s*(\[[\s\S]*?\]);/);
   if (!match) throw new Error('Invalid projects file format');
 
-  const jsonStr = match[1]
-    .replace(/'/g, '"')
+  let jsonStr = match[1]
+    // Replace single quotes with double quotes only if file uses them for values
+    .replace(/:\s*'([^']*)'/g, ': "$1"')
+    // Remove trailing commas
     .replace(/,\s*\]/g, ']')
-    .replace(/,\s*}/g, '}');
+    .replace(/,\s*}/g, '}')
+    // Remove control characters inside strings (tabs, etc.)
+    .replace(/[\t\r]/g, ' ');
 
   return { projects: JSON.parse(jsonStr), sha: fileData.sha, raw };
 }
