@@ -64,16 +64,15 @@ export class ProjectTools {
   }
 
   private parseProjectsFile(content: string): Project[] {
-    // Parse the JS module export: `export const projectsData = [ ... ]`
-    const match = content.match(/export\s+const\s+projectsData\s*=\s*(\[[\s\S]*\]);?/);
+    // Strip comments and parse the array
+    const stripped = content.replace(/\/\/.*$/gm, '');
+    const match = stripped.match(/(?:export\s+)?const\s+projectsData\s*=\s*(\[[\s\S]*?\]);/);
     if (!match) {
       throw new Error('Invalid projects file format');
     }
 
-    // Safely evaluate the array
     const arrayStr = match[1];
     try {
-      // Replace single quotes with double quotes for JSON compatibility
       const jsonStr = arrayStr
         .replace(/'/g, '"')
         .replace(/,\s*\]/g, ']')
@@ -102,7 +101,7 @@ export class ProjectTools {
       return lines.join('\n');
     });
 
-    const content = `export const projectsData = [\n${projectLines.join('\n')}\n];\n`;
+    const content = `const projectsData = [\n${projectLines.join('\n')}\n];\n\nexport default projectsData;\n`;
 
     writeFileSync(projectsPath, content, 'utf-8');
   }

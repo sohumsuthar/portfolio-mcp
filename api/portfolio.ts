@@ -165,7 +165,12 @@ async function deletePost(slug: string) {
 async function listProjects() {
   const fileData = await ghFetch(`/contents/${PROJECTS_FILE}?ref=${GITHUB_BRANCH}`);
   const raw = b64decode(fileData.content);
-  const match = raw.match(/export\s+const\s+projectsData\s*=\s*(\[[\s\S]*\]);?/);
+
+  // Strip single-line comments (// ...)
+  const stripped = raw.replace(/\/\/.*$/gm, '');
+
+  // Match both `const projectsData = [...]` and `export const projectsData = [...]`
+  const match = stripped.match(/(?:export\s+)?const\s+projectsData\s*=\s*(\[[\s\S]*?\]);/);
   if (!match) throw new Error('Invalid projects file format');
 
   const jsonStr = match[1]
@@ -192,7 +197,7 @@ async function writeProjects(projects: any[], sha: string, message: string) {
     return lines.join('\n');
   });
 
-  const content = `export const projectsData = [\n${projectLines.join('\n')}\n];\n`;
+  const content = `const projectsData = [\n${projectLines.join('\n')}\n];\n\nexport default projectsData;\n`;
 
   await ghFetch(`/contents/${PROJECTS_FILE}`, {
     method: 'PUT',
