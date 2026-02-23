@@ -2,9 +2,10 @@
   "name": "portfolio-mcp",
   "version": 2,
   "buildCommand": "npm run build",
-  "outputDirectory": "dist",
-  "env": {
-    "NODE_ENV": "production"
-  },
-  "regions": ["iad1"]
+  "routes": [
+    {
+      "src": "/(.*)",
+      "dest": "/api/portfolio"
+    }
+  ]
 }

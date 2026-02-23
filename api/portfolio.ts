@@ -1,8 +1,8 @@
 import type { VercelRequest, VercelResponse } from '@vercel/node';
-import { PostTools } from '../dist/post-tools.js';
-import { ProjectTools } from '../dist/project-tools.js';
-import { GitTools } from '../dist/git-tools.js';
-import { loadConfig } from '../dist/config.js';
+import { PostTools } from '../src/post-tools';
+import { ProjectTools } from '../src/project-tools';
+import { GitTools } from '../src/git-tools';
+import { loadConfig } from '../src/config';
 
 // Authentication
 const validateAuth = (req: VercelRequest): boolean => {
