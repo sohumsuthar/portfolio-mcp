@@ -166,8 +166,8 @@ async function listProjects() {
   const fileData = await ghFetch(`/contents/${PROJECTS_FILE}?ref=${GITHUB_BRANCH}`);
   const raw = b64decode(fileData.content);
 
-  // Strip single-line comments (// ...)
-  const stripped = raw.replace(/\/\/.*$/gm, '');
+  // Strip lines that are purely comments (starts with //, ignoring whitespace)
+  const stripped = raw.replace(/^\s*\/\/.*$/gm, '');
 
   // Match both `const projectsData = [...]` and `export const projectsData = [...]`
   const match = stripped.match(/(?:export\s+)?const\s+projectsData\s*=\s*(\[[\s\S]*?\]);/);

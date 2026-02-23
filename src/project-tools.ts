@@ -64,8 +64,8 @@ export class ProjectTools {
   }
 
   private parseProjectsFile(content: string): Project[] {
-    // Strip comments and parse the array
-    const stripped = content.replace(/\/\/.*$/gm, '');
+    // Strip lines that are purely comments (won't break // in URLs)
+    const stripped = content.replace(/^\s*\/\/.*$/gm, '');
     const match = stripped.match(/(?:export\s+)?const\s+projectsData\s*=\s*(\[[\s\S]*?\]);/);
     if (!match) {
       throw new Error('Invalid projects file format');
