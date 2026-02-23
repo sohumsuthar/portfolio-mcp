@@ -6,17 +6,5 @@
   "env": {
     "NODE_ENV": "production"
   },
-  "regions": ["sfo1"],
-  "functions": {
-    "dist/api-server.js": {
-      "memory": 512,
-      "maxDuration": 60
-    }
-  },
-  "routes": [
-    {
-      "src": "/.*",
-      "dest": "dist/api-server.js"
-    }
-  ]
+  "regions": ["iad1"]
 }
